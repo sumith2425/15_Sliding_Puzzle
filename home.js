@@ -334,7 +334,7 @@
 			var previousCell;
 			var i = 1;
 			var interval = setInterval(function(){
-				if(i <= 1){
+				if(i <= 100){
 					var adjacent = getAdjacentCells(getEmptyCell());
 					if(previousCell){
 						for(var j = adjacent.length-1; j >= 0; j--){
