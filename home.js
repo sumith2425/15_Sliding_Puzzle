@@ -5,6 +5,7 @@
 		const movesDisplay = document.querySelector("#moves");
 		let startTime = 0;
 		let elapsedTime = 0;
+		let pause=false;
 		let intervalId;
 		let hrs = 0;
 		let mins = 0;
@@ -13,13 +14,14 @@
 		movesDisplay.textContent=moves;
 		// localStorage.removeItem("bestTime");
 		function startTimer(){
-			startTime = Date.now();
-			intervalId = setInterval(updateTime, 1000);
-		};
+			if(!pause){
+				startTime = Date.now();
+				intervalId = setInterval(updateTime, 1000);
+			};
+		}
 
 		function updateTime(){
 			elapsedTime = Date.now() - startTime;
-
 			displaytime();
 			timeDisplay.textContent = `${hrs}:${mins}:${secs}`;
 		}
@@ -55,7 +57,10 @@
 		});
 		
 		// Listens for click on control buttons
-		document.getElementById('scramble').addEventListener('click', scramble);
+		document.getElementById('scramble').addEventListener('click',  function(){
+			state=1;
+			scramble();
+		});
 
 		function abs(a){
 			if(a<0)return -a;
@@ -128,7 +133,9 @@
 						if(checkOrder()){
 							var isbest=(!localStorage.getItem("bestTime"))||(elapsedTime<localStorage.getItem("bestTime"));
 							var isbestmoves=(!localStorage.getItem("bestMoves"))||(moves<localStorage.getItem("bestMoves"));
-							// paused=true;
+							pause=true;
+							clearInterval(intervalId);
+							state=0;
 							var text = `
 								<div>
 								You have Solved the Puzzle! 🎉<br>
@@ -158,11 +165,12 @@
 								html: text,
 								confirmButtonText: "New Game",
 								confirmButtonColor: "#3085d6",
-								cancelButtonColor: "#d33",
-								showCancelButton: true,
+								// cancelButtonColor: "#d33",
+								// showCancelButton: true,
 							}).then((result) => {
 								/* Read more about isConfirmed, isDenied below */
 								if (result.isConfirmed) {
+									state=1;
 									scramble();
 								} 
 							});
@@ -341,7 +349,12 @@
 					i++;
 				} else {
 					clearInterval(interval);
-					clearInterval
+					moves=0;
+					clearInterval(intervalId);
+					startTime=Date.now();
+					updateTime();
+					movesDisplay.textContent=moves;
+					pause=false;
 					startTimer();
 					state = 1;
 				}
